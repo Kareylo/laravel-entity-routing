@@ -6,10 +6,12 @@ use Kareylo\EntityRouting\EntityUrlGenerator;
 use Kareylo\EntityRouting\Exceptions\EntityRouteNotFoundException;
 use Kareylo\EntityRouting\Exceptions\MissingEntityRouteParameterException;
 use Kareylo\EntityRouting\Tests\Fixtures\ArticleData;
+use Kareylo\EntityRouting\Tests\Fixtures\MappedArticle;
 
 beforeEach(function () {
     Route::get('/articles/{id}/{slug}', fn () => null)->name('articles.show');
     Route::get('/drafts/{id}/{slug?}', fn () => null)->name('drafts.show');
+    Route::get('/blog/{category}/{year}/{slug}', fn () => null)->name('blog.show');
     Route::getRoutes()->refreshNameLookups();
 
     $this->generator = $this->app->make(EntityUrlGenerator::class);
@@ -38,6 +40,16 @@ it('fills a parameter the entity lacks from explicit values', function () {
 it('appends explicit values that match no placeholder as query string', function () {
     expect($this->generator->generate('articles.show', new ArticleData, ['page' => 2], absolute: false))
         ->toBe('/articles/42/my-title?page=2');
+});
+
+it('uses the mapping declared by the entity before its attributes', function () {
+    expect($this->generator->generate('blog.show', new MappedArticle, absolute: false))
+        ->toBe('/blog/news/2026/my-title');
+});
+
+it('gives explicit values precedence over the entity mapping', function () {
+    expect($this->generator->generate('blog.show', new MappedArticle, ['category' => 'tech'], absolute: false))
+        ->toBe('/blog/tech/2026/my-title');
 });
 
 it('omits an unresolved optional parameter', function () {
