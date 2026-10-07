@@ -42,7 +42,11 @@ It only affects URL **generation**. Incoming requests and route model binding ar
 composer require kareylo/laravel-entity-routing
 ```
 
-The service provider is registered automatically through package discovery. There is no configuration file.
+The service provider is registered automatically through package discovery. Publishing the configuration file is only needed for the [native route helper](#native-route-helper-opt-in):
+
+```bash
+php artisan vendor:publish --tag=entity-routing-config
+```
 
 ## Usage
 
@@ -133,12 +137,48 @@ entity_route('blog.show', $article); // https://example.com/blog/news/2026/my-ti
 
 Domain placeholders (`{account}.example.com`) are resolved like any other, and everything works with `php artisan route:cache`.
 
+## Native route helper (opt-in)
+
+Laravel's own helpers can accept an entity too, under the reserved `_entity` parameter. Enable it in `config/entity-routing.php`:
+
+```php
+'native_route_helper' => true,
+```
+
+Then:
+
+```php
+route('articles.show', ['_entity' => $article]);                                    // https://example.com/articles/42/my-title
+route('articles.show', ['_entity' => $article, 'slug' => 'other', 'page' => 2], false); // /articles/42/other?page=2
+
+to_route('articles.show', ['_entity' => $article]);
+redirect()->route('articles.show', ['_entity' => $article], 301);
+URL::signedRoute('articles.show', ['_entity' => $article]);
+URL::temporarySignedRoute('articles.show', now()->addHour(), ['_entity' => $article]);
+```
+
+```blade
+<a href="{{ route('articles.show', ['_entity' => $article]) }}">Read</a>
+```
+
+The other keys of the array behave like `$extra`. Resolution rules, exceptions and `route:cache` support are the same as with `entity_route()`.
+
+How it works: when the flag is on, the `url` service is replaced by `Kareylo\EntityRouting\EntityAwareUrlGenerator`, a subclass of Laravel's `UrlGenerator` that keeps the original state (forced root, signing key, defaults...). Its `route()` method handles `_entity` and passes every other call to Laravel unchanged. With the flag off (the default), Laravel's generator is not touched.
+
+Things to know:
+
+- **`_entity` is reserved** in route parameters while the flag is on.
+- **Calls without `_entity` keep Laravel's behavior**, including `route('posts.show', $post)`, which still fills placeholders by position.
+- **Another package replacing the `url` service** conflicts with this one: whichever registers last wins.
+- **Code holding the url generator before this package registers** keeps the original instance.
+- **IDEs and static analysis** do not know the `_entity` key.
+
 ## Limitations
 
 - **`null` means "not resolved".** A `null` value, including `['slug' => null]` in `$extra`, falls through to the next rule. An empty string is a value and is used as is.
 - **Arrays have no class name.** Rule 4 never applies to them, and `{article:slug}` on an array reads `article.slug`, not the array's own `slug`. Use `{slug}` or `$extra` instead.
 - **Only public data is read.** Private and protected properties of plain objects are invisible; expose them with `ProvidesRouteParameters`.
-- **`route()` itself is unchanged.** Passing an entity to `route()` keeps Laravel's native behavior. Use `entity_route()` or the macros.
+- **`route()` is unchanged by default.** Passing an entity to `route()` keeps Laravel's native behavior, unless you enable the [native route helper](#native-route-helper-opt-in) and use `_entity`.
 - **Tested versions.** CI installs the lowest versions Composer allows, which are Laravel 12.69 and 13.30: older releases are blocked by security advisories. Earlier 12.x and 13.x releases are allowed by the constraints but not tested. Laravel 12.0 to 12.3 encode `%`, `?` and `#` inside values differently from later versions; this package passes values to Laravel's generator as is, so it follows whatever your version does.
 
 ## Testing

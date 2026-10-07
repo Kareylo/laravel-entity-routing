@@ -5,6 +5,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-07
+
+### Added
+
+- Opt-in native route helper (`native_route_helper` in the new publishable `config/entity-routing.php`, disabled by default): `route()`, `to_route()`, `redirect()->route()`, `URL::signedRoute()`, `URL::temporarySignedRoute()` and Blade accept an entity under the reserved `_entity` parameter.
+- `EntityAwareUrlGenerator`, the url generator subclass used when the flag is on.
+
 ## [0.1.0] - 2026-10-07
 
 ### Added
@@ -17,5 +24,6 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - Supports Laravel 12 and 13 on PHP 8.2 to 8.5.
 - CI: test matrix, Larastan, Pint, coverage (minimum 80%) and GitHub Release on tags.
 
-[Unreleased]: https://github.com/Kareylo/laravel-entity-routing/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/Kareylo/laravel-entity-routing/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/Kareylo/laravel-entity-routing/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Kareylo/laravel-entity-routing/releases/tag/v0.1.0
