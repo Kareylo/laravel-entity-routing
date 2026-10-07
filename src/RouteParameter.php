@@ -11,5 +11,6 @@ final class RouteParameter
         public readonly string $name,
         public readonly bool $optional,
         public readonly ?string $bindingField,
+        public readonly bool $inDomain = false,
     ) {}
 }

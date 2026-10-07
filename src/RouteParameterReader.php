@@ -17,6 +17,9 @@ class RouteParameterReader
         preg_match_all('/\{(\w+)\?\}/', $route->getDomain().$route->uri(), $matches);
         $optional = $matches[1];
 
+        preg_match_all('/\{(\w+)\??\}/', (string) $route->getDomain(), $matches);
+        $domain = $matches[1];
+
         /** @var list<string> $names */
         $names = $route->parameterNames();
 
@@ -25,6 +28,7 @@ class RouteParameterReader
                 $name,
                 in_array($name, $optional, true),
                 $route->bindingFieldFor($name),
+                in_array($name, $domain, true),
             ),
             $names,
         );

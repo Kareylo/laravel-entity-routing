@@ -27,6 +27,11 @@ trait HasEntityUrls
      */
     public function getEntityUrlsAttribute(): array
     {
+        // An unsaved model has no route key yet: it must not break serialization.
+        if (! $this->exists) {
+            return [];
+        }
+
         $urls = app(EntityUrlGenerator::class);
 
         return array_map(fn (string $route) => $urls->generate($route, $this), $this->entityRoutes());

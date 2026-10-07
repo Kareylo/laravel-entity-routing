@@ -5,6 +5,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-10-07
+
+### Security
+
+- Domain placeholder values may only contain host characters (letters, digits, `.`, `-`); others throw the new `InvalidEntityRouteParameterException`, so a value can no longer move a url to another host.
+- Attributes an Eloquent model hides from serialization (`$hidden` / `$visible`) are no longer used implicitly by binding fields and attribute lookup, on the entity or on related models. Explicit values and `ProvidesRouteParameters` mappings still use them.
+- With the native route helper, `_entity` must be an object; arrays throw `InvalidArgumentException`.
+- `HasEntityUrls` gives `[]` for models that are not saved yet instead of failing serialization.
+- CI: actions pinned to commit SHAs, least-privilege token permissions, `composer audit` step, Dependabot.
+- Added `SECURITY.md`.
+
 ## [0.3.0] - 2026-10-07
 
 ### Added
@@ -30,7 +41,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - Supports Laravel 12 and 13 on PHP 8.2 to 8.5.
 - CI: test matrix, Larastan, Pint, coverage (minimum 80%) and GitHub Release on tags.
 
-[Unreleased]: https://github.com/Kareylo/laravel-entity-routing/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/Kareylo/laravel-entity-routing/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/Kareylo/laravel-entity-routing/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/Kareylo/laravel-entity-routing/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/Kareylo/laravel-entity-routing/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Kareylo/laravel-entity-routing/releases/tag/v0.1.0

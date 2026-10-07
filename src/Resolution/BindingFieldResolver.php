@@ -2,6 +2,7 @@
 
 namespace Kareylo\EntityRouting\Resolution;
 
+use Kareylo\EntityRouting\EntityAttributes;
 use Kareylo\EntityRouting\EntityNaming;
 use Kareylo\EntityRouting\RouteParameter;
 
@@ -11,7 +12,10 @@ use Kareylo\EntityRouting\RouteParameter;
  */
 final class BindingFieldResolver implements ParameterResolver
 {
-    public function __construct(private readonly EntityNaming $naming) {}
+    public function __construct(
+        private readonly EntityNaming $naming,
+        private readonly EntityAttributes $attributes = new EntityAttributes,
+    ) {}
 
     public function resolve(RouteParameter $parameter, mixed $entity, array $extra): Resolution
     {
@@ -23,6 +27,6 @@ final class BindingFieldResolver implements ParameterResolver
             ? $parameter->bindingField
             : "{$parameter->name}.{$parameter->bindingField}";
 
-        return Resolution::of(data_get($entity, $path));
+        return Resolution::of($this->attributes->get($entity, $path));
     }
 }

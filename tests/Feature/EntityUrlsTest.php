@@ -10,6 +10,7 @@ beforeEach(function () {
     Route::getRoutes()->refreshNameLookups();
 
     $this->book = new Book(['id' => 42, 'slug' => 'my-title']);
+    $this->book->exists = true;
 });
 
 it('resolves every declared route of the model', function () {
@@ -36,6 +37,13 @@ it('can leave the urls out of serialization', function () {
     expect($this->book->makeHidden('entity_urls')->toArray())->not->toHaveKey('entity_urls');
 });
 
-it('throws when a declared route cannot be resolved', function () {
-    (new Book(['slug' => 'my-title']))->toArray();
+it('gives no urls for a model that is not saved yet', function () {
+    expect((new Book(['slug' => 'my-title']))->toArray()['entity_urls'])->toBe([]);
+});
+
+it('throws when a declared route of a saved model cannot be resolved', function () {
+    $book = new Book(['slug' => 'my-title']);
+    $book->exists = true;
+
+    $book->toArray();
 })->throws(MissingEntityRouteParameterException::class);

@@ -3,13 +3,29 @@
 use Illuminate\Routing\CompiledRouteCollection;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
+use Kareylo\EntityRouting\Exceptions\InvalidEntityRouteParameterException;
 use Kareylo\EntityRouting\Tests\Fixtures\Article;
 use Kareylo\EntityRouting\Tests\Fixtures\ArticleData;
 
 describe('domain routes', function () {
     beforeEach(function () {
         Route::domain('{account}.example.com')->get('/users/{user}', fn () => null)->name('users.show');
+        Route::domain('{domain}')->get('/shop', fn () => null)->name('shop.show');
         Route::getRoutes()->refreshNameLookups();
+    });
+
+    it('rejects domain values that change the host', function (string $account) {
+        entity_route('users.show', ['account' => $account, 'user' => 5]);
+    })->with(['evil.com/', 'x@evil.com', 'evil.com:80', 'evil.com\\', 'a b'])
+        ->throws(InvalidEntityRouteParameterException::class, 'Invalid value for domain parameter [account] of route [users.show].');
+
+    it('rejects host-changing domain values given explicitly', function () {
+        entity_route('users.show', ['user' => 5], ['account' => 'evil.com/']);
+    })->throws(InvalidEntityRouteParameterException::class);
+
+    it('accepts a full host in a domain placeholder', function () {
+        expect(entity_route('shop.show', ['domain' => 'shop.example.org']))
+            ->toBe('http://shop.example.org/shop');
     });
 
     it('fills domain placeholders from the entity', function () {
