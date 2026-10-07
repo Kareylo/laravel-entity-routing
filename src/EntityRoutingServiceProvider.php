@@ -14,6 +14,7 @@ use Kareylo\EntityRouting\Resolution\ExtraValueResolver;
 use Kareylo\EntityRouting\Resolution\ParameterResolver;
 use Kareylo\EntityRouting\Resolution\ResolverChain;
 use Kareylo\EntityRouting\Resolution\RouteKeyResolver;
+use Kareylo\EntityRouting\Resolution\UrlDefaultsResolver;
 
 class EntityRoutingServiceProvider extends ServiceProvider
 {
@@ -25,6 +26,7 @@ class EntityRoutingServiceProvider extends ServiceProvider
             new BindingFieldResolver($app->make(EntityNaming::class)),
             new RouteKeyResolver($app->make(EntityNaming::class)),
             new AttributeResolver,
+            new UrlDefaultsResolver($app->make(UrlGenerator::class)),
         ]));
     }
 
