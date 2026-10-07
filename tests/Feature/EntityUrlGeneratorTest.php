@@ -25,6 +25,21 @@ it('generates a relative url', function () {
         ->toBe('/articles/42/my-title');
 });
 
+it('gives explicit values precedence over the entity', function () {
+    expect($this->generator->generate('articles.show', new ArticleData, ['slug' => 'other'], absolute: false))
+        ->toBe('/articles/42/other');
+});
+
+it('fills a parameter the entity lacks from explicit values', function () {
+    expect($this->generator->generate('articles.show', new ArticleData(slug: null), ['slug' => 'other'], absolute: false))
+        ->toBe('/articles/42/other');
+});
+
+it('appends explicit values that match no placeholder as query string', function () {
+    expect($this->generator->generate('articles.show', new ArticleData, ['page' => 2], absolute: false))
+        ->toBe('/articles/42/my-title?page=2');
+});
+
 it('omits an unresolved optional parameter', function () {
     expect($this->generator->generate('drafts.show', new ArticleData(slug: null)))
         ->toBe('http://localhost/drafts/42');

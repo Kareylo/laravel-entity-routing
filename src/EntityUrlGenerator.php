@@ -20,17 +20,22 @@ class EntityUrlGenerator
     ) {}
 
     /**
+     * @param  array<array-key, mixed>  $extra  explicit values, taking precedence over the entity;
+     *                                          those matching no placeholder become the query string
+     *
      * @throws EntityRouteNotFoundException
      * @throws MissingEntityRouteParameterException
      */
-    public function generate(string $name, mixed $entity, bool $absolute = true): string
+    public function generate(string $name, mixed $entity, array $extra = [], bool $absolute = true): string
     {
         $route = $this->routes->find($name);
         $values = [];
         $missing = [];
+        $query = $extra;
 
         foreach ($this->parameters->read($route) as $parameter) {
-            $resolution = $this->resolver->resolve($parameter, $entity);
+            $resolution = $this->resolver->resolve($parameter, $entity, $extra);
+            unset($query[$parameter->name]);
 
             if ($resolution->resolved()) {
                 $values[$parameter->name] = $resolution->value();
@@ -43,6 +48,6 @@ class EntityUrlGenerator
             throw MissingEntityRouteParameterException::forEntity($route, $missing, $entity);
         }
 
-        return $this->url->route($name, $values, $absolute);
+        return $this->url->route($name, $values + $query, $absolute);
     }
 }
