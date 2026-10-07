@@ -5,3 +5,5 @@ parameters:
     level: max
     paths:
         - src
+        # Uses HasEntityUrls, so the trait is analysed in a model context.
+        - tests/Fixtures/Models/Book.php
