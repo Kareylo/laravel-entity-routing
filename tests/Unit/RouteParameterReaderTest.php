@@ -48,7 +48,7 @@ it('reads domain parameters before uri parameters', function () {
     $route = $this->router->get('/users/{user}', fn () => null)->domain('{account}.example.com');
 
     expect($this->reader->read($route))->toEqual([
-        new RouteParameter('account', optional: false, bindingField: null),
+        new RouteParameter('account', optional: false, bindingField: null, inDomain: true),
         new RouteParameter('user', optional: false, bindingField: null),
     ]);
 });

@@ -55,3 +55,9 @@ it('behaves natively without _entity', function () {
         ->and($copy->route('articles.show', [7, 'native'], false))
         ->toBe('/articles/7/native');
 });
+
+it('only accepts an object under _entity', function () {
+    $copy = EntityAwareUrlGenerator::fromGenerator($this->original, $this->entities);
+
+    $copy->route('articles.show', ['_entity' => ['id' => 42, 'slug' => 'my-title']]);
+})->throws(InvalidArgumentException::class, 'The "_entity" route parameter must be an object.');

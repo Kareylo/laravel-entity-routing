@@ -90,3 +90,7 @@ PHP);
         ->and(route('cached.articles.show', ['_entity' => new Article]))
         ->toBe('http://localhost/categories/news/articles/my-title');
 });
+
+it('rejects an array forwarded under _entity, such as request input', function () {
+    route('articles.show', ['_entity' => ['id' => 42, 'slug' => 'my-title']]);
+})->throws(InvalidArgumentException::class);

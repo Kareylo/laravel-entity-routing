@@ -4,6 +4,7 @@ namespace Kareylo\EntityRouting;
 
 use Closure;
 use Illuminate\Routing\UrlGenerator;
+use InvalidArgumentException;
 
 /**
  * Laravel's url generator, accepting an entity under the reserved "_entity"
@@ -57,6 +58,11 @@ class EntityAwareUrlGenerator extends UrlGenerator
 
         $entity = $parameters[self::ENTITY_PARAMETER];
         unset($parameters[self::ENTITY_PARAMETER]);
+
+        // Arrays are refused: they may be request input forwarded to route().
+        if (! is_object($entity)) {
+            throw new InvalidArgumentException('The "'.self::ENTITY_PARAMETER.'" route parameter must be an object.');
+        }
 
         return ($this->entities)()->generate($name, $entity, $parameters, $absolute);
     }

@@ -167,7 +167,7 @@ How it works: when the flag is on, the `url` service is replaced by `Kareylo\Ent
 
 Things to know:
 
-- **`_entity` is reserved** in route parameters while the flag is on.
+- **`_entity` is reserved** in route parameters while the flag is on, and must be an object: arrays (for example request input forwarded to `route()`) throw `InvalidArgumentException`. Use `entity_route()` for arrays.
 - **Calls without `_entity` keep Laravel's behavior**, including `route('posts.show', $post)`, which still fills placeholders by position.
 - **Another package replacing the `url` service** conflicts with this one: whichever registers last wins.
 - **Code holding the url generator before this package registers** keeps the original instance.
@@ -210,7 +210,7 @@ return Inertia::render('Articles/Index', ['articles' => Article::all()]);
 
 - URLs are absolute and resolved with every rule above, including `ProvidesRouteParameters` closures and `URL::defaults()`.
 - Leave them out with `$article->makeHidden('entity_urls')`.
-- A declared route that cannot be resolved throws `MissingEntityRouteParameterException` during serialization.
+- A model that is not saved yet gives `[]`. A declared route of a saved model that cannot be resolved throws `MissingEntityRouteParameterException` during serialization.
 - For arrays, plain objects or a single URL, call `entity_route()` where you build the props.
 
 The PHP package does not depend on Inertia or any frontend tool.
@@ -220,6 +220,9 @@ The PHP package does not depend on Inertia or any frontend tool.
 - **`null` means "not resolved".** A `null` value, including `['slug' => null]` in `$extra`, falls through to the next rule. An empty string is a value and is used as is.
 - **Arrays have no class name.** Rule 4 never applies to them, and `{article:slug}` on an array reads `article.slug`, not the array's own `slug`. Use `{slug}` or `$extra` instead.
 - **Only public data is read.** Private and protected properties of plain objects are invisible; expose them with `ProvidesRouteParameters`.
+- **Hidden attributes are never used implicitly.** Attributes an Eloquent model hides from serialization (`$hidden`, or missing from `$visible`), on the entity or on a related model, are skipped by binding fields and attribute lookup. Pass them in `$extra` or map them with `ProvidesRouteParameters` when a url really needs them.
+- **Domain values must be host labels.** A value placed in a domain placeholder may only contain letters, digits, `.` and `-`; anything else (`evil.com/`, `user@evil.com`...) throws `InvalidEntityRouteParameterException`. Use punycode (`xn--...`) for internationalized domains.
+- **Path values are not sanitized.** Like `route()`, `/` and `..` are kept in path values. Validate user-chosen slugs (e.g. with `Str::slug()`) before saving them.
 - **`route()` is unchanged by default.** Passing an entity to `route()` keeps Laravel's native behavior, unless you enable the [native route helper](#native-route-helper-opt-in) and use `_entity`.
 - **Tested versions.** CI installs the lowest versions Composer allows, which are Laravel 12.69 and 13.30: older releases are blocked by security advisories. Earlier 12.x and 13.x releases are allowed by the constraints but not tested. Laravel 12.0 to 12.3 encode `%`, `?` and `#` inside values differently from later versions; this package passes values to Laravel's generator as is, so it follows whatever your version does.
 
