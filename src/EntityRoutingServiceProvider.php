@@ -10,6 +10,7 @@ use Kareylo\EntityRouting\Resolution\EntityMappingResolver;
 use Kareylo\EntityRouting\Resolution\ExtraValueResolver;
 use Kareylo\EntityRouting\Resolution\ParameterResolver;
 use Kareylo\EntityRouting\Resolution\ResolverChain;
+use Kareylo\EntityRouting\Resolution\RouteKeyResolver;
 
 class EntityRoutingServiceProvider extends ServiceProvider
 {
@@ -19,6 +20,7 @@ class EntityRoutingServiceProvider extends ServiceProvider
             new ExtraValueResolver,
             new EntityMappingResolver,
             new BindingFieldResolver($app->make(EntityNaming::class)),
+            new RouteKeyResolver($app->make(EntityNaming::class)),
             new AttributeResolver,
         ]));
     }
