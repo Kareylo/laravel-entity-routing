@@ -16,6 +16,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - CI: actions pinned to commit SHAs, least-privilege token permissions, `composer audit` step, Dependabot.
 - Added `SECURITY.md`.
 
+### Added
+
+- `CONTRIBUTING.md`: setup, workflow and conventions for contributors.
+
 ## [0.3.0] - 2026-10-07
 
 ### Added

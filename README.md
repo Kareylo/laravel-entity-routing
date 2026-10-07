@@ -226,7 +226,9 @@ The PHP package does not depend on Inertia or any frontend tool.
 - **`route()` is unchanged by default.** Passing an entity to `route()` keeps Laravel's native behavior, unless you enable the [native route helper](#native-route-helper-opt-in) and use `_entity`.
 - **Tested versions.** CI installs the lowest versions Composer allows, which are Laravel 12.69 and 13.30: older releases are blocked by security advisories. Earlier 12.x and 13.x releases are allowed by the constraints but not tested. Laravel 12.0 to 12.3 encode `%`, `?` and `#` inside values differently from later versions; this package passes values to Laravel's generator as is, so it follows whatever your version does.
 
-## Testing
+## Contributing
+
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the setup, the workflow (tests first, then code) and the conventions. Report security issues privately as described in [SECURITY.md](SECURITY.md).
 
 ```bash
 composer test            # Pest
