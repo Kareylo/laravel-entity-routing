@@ -173,6 +173,48 @@ Things to know:
 - **Code holding the url generator before this package registers** keeps the original instance.
 - **IDEs and static analysis** do not know the `_entity` key.
 
+## Frontend and Inertia.js
+
+Frontend route helpers (Ziggy, Wayfinder) fill each placeholder on their own and do not know these resolution rules. The simplest way to get identical URLs on the frontend is to resolve them on the server and send them as strings.
+
+Add `HasEntityUrls` to a model and declare its routes:
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use Kareylo\EntityRouting\Concerns\HasEntityUrls;
+
+class Article extends Model
+{
+    use HasEntityUrls;
+
+    public function entityRoutes(): array
+    {
+        return [
+            'show' => 'articles.show',
+            'edit' => 'articles.edit',
+        ];
+    }
+}
+```
+
+`entity_urls` is then appended whenever the model is serialized, so it reaches Inertia props, JSON responses and API resources:
+
+```php
+return Inertia::render('Articles/Index', ['articles' => Article::all()]);
+```
+
+```jsx
+// [{ id: 42, slug: 'my-title', entity_urls: { show: 'https://example.com/articles/42/my-title', edit: '...' } }]
+<a href={article.entity_urls.show}>Read</a>
+```
+
+- URLs are absolute and resolved with every rule above, including `ProvidesRouteParameters` closures and `URL::defaults()`.
+- Leave them out with `$article->makeHidden('entity_urls')`.
+- A declared route that cannot be resolved throws `MissingEntityRouteParameterException` during serialization.
+- For arrays, plain objects or a single URL, call `entity_route()` where you build the props.
+
+The PHP package does not depend on Inertia or any frontend tool.
+
 ## Limitations
 
 - **`null` means "not resolved".** A `null` value, including `['slug' => null]` in `$extra`, falls through to the next rule. An empty string is a value and is used as is.

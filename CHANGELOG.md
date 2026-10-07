@@ -5,6 +5,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-07
+
+### Added
+
+- `HasEntityUrls` model trait: declare routes in `entityRoutes()`, get their resolved urls in the `entity_urls` attribute, appended on serialization (Inertia props, JSON, API resources).
+
 ## [0.2.0] - 2026-10-07
 
 ### Added
@@ -24,6 +30,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - Supports Laravel 12 and 13 on PHP 8.2 to 8.5.
 - CI: test matrix, Larastan, Pint, coverage (minimum 80%) and GitHub Release on tags.
 
-[Unreleased]: https://github.com/Kareylo/laravel-entity-routing/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/Kareylo/laravel-entity-routing/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/Kareylo/laravel-entity-routing/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/Kareylo/laravel-entity-routing/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Kareylo/laravel-entity-routing/releases/tag/v0.1.0
