@@ -22,6 +22,13 @@ class EntityRoutingServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/entity-routing.php', 'entity-routing');
 
+        if ($this->app->make('config')->get('entity-routing.native_route_helper') === true) {
+            $this->app->extend('url', fn (UrlGenerator $url, Container $app) => EntityAwareUrlGenerator::fromGenerator(
+                $url,
+                fn () => $app->make(EntityUrlGenerator::class),
+            ));
+        }
+
         $this->app->bind(ParameterResolver::class, fn (Container $app) => new ResolverChain([
             new ExtraValueResolver,
             new EntityMappingResolver,
