@@ -20,6 +20,8 @@ class EntityRoutingServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->mergeConfigFrom(__DIR__.'/../config/entity-routing.php', 'entity-routing');
+
         $this->app->bind(ParameterResolver::class, fn (Container $app) => new ResolverChain([
             new ExtraValueResolver,
             new EntityMappingResolver,
@@ -32,6 +34,10 @@ class EntityRoutingServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->publishes([
+            __DIR__.'/../config/entity-routing.php' => config_path('entity-routing.php'),
+        ], 'entity-routing-config');
+
         UrlGenerator::macro('entityRoute', function (string $name, mixed $entity, array $extra = [], bool $absolute = true): string {
             return app(EntityUrlGenerator::class)->generate($name, $entity, $extra, $absolute);
         });
