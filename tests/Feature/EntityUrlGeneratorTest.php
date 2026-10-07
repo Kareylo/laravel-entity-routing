@@ -8,12 +8,15 @@ use Kareylo\EntityRouting\Exceptions\MissingEntityRouteParameterException;
 use Kareylo\EntityRouting\Tests\Fixtures\Article;
 use Kareylo\EntityRouting\Tests\Fixtures\ArticleData;
 use Kareylo\EntityRouting\Tests\Fixtures\MappedArticle;
+use Kareylo\EntityRouting\Tests\Fixtures\Models\Article as ArticleModel;
 
 beforeEach(function () {
     Route::get('/articles/{id}/{slug}', fn () => null)->name('articles.show');
     Route::get('/drafts/{id}/{slug?}', fn () => null)->name('drafts.show');
     Route::get('/blog/{category}/{year}/{slug}', fn () => null)->name('blog.show');
     Route::get('/categories/{category:slug}/articles/{article:slug}', fn () => null)->name('categories.articles.show');
+    Route::get('/posts/{article}', fn () => null)->name('posts.show');
+    Route::get('/posts/{article:slug}/edit', fn () => null)->name('posts.edit');
     Route::getRoutes()->refreshNameLookups();
 
     $this->generator = $this->app->make(EntityUrlGenerator::class);
@@ -57,6 +60,16 @@ it('gives explicit values precedence over the entity mapping', function () {
 it('uses binding fields before attributes', function () {
     expect($this->generator->generate('categories.articles.show', new Article, absolute: false))
         ->toBe('/categories/news/articles/my-title');
+});
+
+it('uses the route key of the entity the parameter is named after', function () {
+    expect($this->generator->generate('posts.show', new ArticleModel(['id' => 42]), absolute: false))
+        ->toBe('/posts/42');
+});
+
+it('uses the binding field before the route key', function () {
+    expect($this->generator->generate('posts.edit', new ArticleModel(['id' => 42, 'slug' => 'my-title']), absolute: false))
+        ->toBe('/posts/my-title/edit');
 });
 
 it('omits an unresolved optional parameter', function () {
