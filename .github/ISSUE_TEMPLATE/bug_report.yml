@@ -1,0 +1,101 @@
+name: Bug report
+description: A url is generated wrongly, or an error is thrown where it should not be.
+title: "Bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. For a security problem, do not open an issue: follow [SECURITY.md](https://github.com/Kareylo/laravel-entity-routing/blob/main/SECURITY.md).
+
+  - type: input
+    id: package-version
+    attributes:
+      label: Package version
+      placeholder: v0.3.1
+    validations:
+      required: true
+
+  - type: input
+    id: laravel-version
+    attributes:
+      label: Laravel version
+      placeholder: "13.35.0"
+    validations:
+      required: true
+
+  - type: input
+    id: php-version
+    attributes:
+      label: PHP version
+      placeholder: "8.4.12"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: entry-point
+    attributes:
+      label: Entry point
+      options:
+        - entity_route()
+        - URL::entityRoute() / url()->entityRoute()
+        - redirect()->toEntityRoute()
+        - route() with _entity (native route helper)
+        - HasEntityUrls (entity_urls)
+    validations:
+      required: true
+
+  - type: textarea
+    id: route
+    attributes:
+      label: Route definition
+      description: The route as declared, including domain and binding fields.
+      render: php
+      placeholder: |
+        Route::get('/articles/{id}/{slug}', ShowArticle::class)->name('articles.show');
+    validations:
+      required: true
+
+  - type: textarea
+    id: entity
+    attributes:
+      label: Entity
+      description: The model, array or object passed, with the relevant attributes and any routeParameters() mapping.
+      render: php
+    validations:
+      required: true
+
+  - type: textarea
+    id: call
+    attributes:
+      label: Call
+      render: php
+      placeholder: |
+        entity_route('articles.show', $article, ['page' => 2]);
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected url or behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual url or error
+      description: Paste the full exception message if one is thrown.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I am on the latest release.
+          required: true
+        - label: I checked the resolution order and the limitations in the README.
+          required: true
