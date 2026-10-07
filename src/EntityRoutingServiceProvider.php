@@ -3,6 +3,9 @@
 namespace Kareylo\EntityRouting;
 
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Redirector;
+use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\ServiceProvider;
 use Kareylo\EntityRouting\Resolution\AttributeResolver;
 use Kareylo\EntityRouting\Resolution\BindingFieldResolver;
@@ -23,5 +26,17 @@ class EntityRoutingServiceProvider extends ServiceProvider
             new RouteKeyResolver($app->make(EntityNaming::class)),
             new AttributeResolver,
         ]));
+    }
+
+    public function boot(): void
+    {
+        UrlGenerator::macro('entityRoute', function (string $name, mixed $entity, array $extra = [], bool $absolute = true): string {
+            return app(EntityUrlGenerator::class)->generate($name, $entity, $extra, $absolute);
+        });
+
+        Redirector::macro('toEntityRoute', function (string $name, mixed $entity, array $extra = [], int $status = 302, array $headers = []): RedirectResponse {
+            /** @var Redirector $this */
+            return $this->to(app(EntityUrlGenerator::class)->generate($name, $entity, $extra), $status, $headers);
+        });
     }
 }
