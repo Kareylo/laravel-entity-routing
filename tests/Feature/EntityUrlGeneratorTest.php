@@ -1,0 +1,57 @@
+<?php
+
+use Illuminate\Routing\Exceptions\UrlGenerationException;
+use Illuminate\Support\Facades\Route;
+use Kareylo\EntityRouting\EntityUrlGenerator;
+use Kareylo\EntityRouting\Exceptions\EntityRouteNotFoundException;
+use Kareylo\EntityRouting\Exceptions\MissingEntityRouteParameterException;
+use Kareylo\EntityRouting\Tests\Fixtures\ArticleData;
+
+beforeEach(function () {
+    Route::get('/articles/{id}/{slug}', fn () => null)->name('articles.show');
+    Route::get('/drafts/{id}/{slug?}', fn () => null)->name('drafts.show');
+    Route::getRoutes()->refreshNameLookups();
+
+    $this->generator = $this->app->make(EntityUrlGenerator::class);
+});
+
+it('fills every placeholder from the entity', function () {
+    expect($this->generator->generate('articles.show', new ArticleData))
+        ->toBe('http://localhost/articles/42/my-title');
+});
+
+it('generates a relative url', function () {
+    expect($this->generator->generate('articles.show', new ArticleData, absolute: false))
+        ->toBe('/articles/42/my-title');
+});
+
+it('omits an unresolved optional parameter', function () {
+    expect($this->generator->generate('drafts.show', new ArticleData(slug: null)))
+        ->toBe('http://localhost/drafts/42');
+});
+
+it('throws when required parameters cannot be resolved', function () {
+    $this->generator->generate('articles.show', new ArticleData(id: null, slug: null));
+})->throws(
+    MissingEntityRouteParameterException::class,
+    'Missing required parameters for [Route: articles.show] [URI: articles/{id}/{slug}] [Entity: '.ArticleData::class.'] [Missing parameters: id, slug].',
+);
+
+it('exposes the missing parameters on the exception', function () {
+    try {
+        $this->generator->generate('articles.show', new ArticleData(slug: null));
+    } catch (MissingEntityRouteParameterException $e) {
+        expect($e)->toBeInstanceOf(UrlGenerationException::class)
+            ->and($e->routeName)->toBe('articles.show')
+            ->and($e->missingParameters)->toBe(['slug'])
+            ->and($e->entityType)->toBe(ArticleData::class);
+
+        return;
+    }
+
+    $this->fail('No exception thrown.');
+});
+
+it('throws for an unknown route', function () {
+    $this->generator->generate('unknown', new ArticleData);
+})->throws(EntityRouteNotFoundException::class, 'Route [unknown] not defined.');
