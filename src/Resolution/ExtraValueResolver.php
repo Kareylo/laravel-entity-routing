@@ -5,12 +5,12 @@ namespace Kareylo\EntityRouting\Resolution;
 use Kareylo\EntityRouting\RouteParameter;
 
 /**
- * Reads the entity attribute named after the parameter.
+ * Uses the value explicitly given by the caller for the parameter.
  */
-final class AttributeResolver implements ParameterResolver
+final class ExtraValueResolver implements ParameterResolver
 {
     public function resolve(RouteParameter $parameter, mixed $entity, array $extra): Resolution
     {
-        return Resolution::of(data_get($entity, $parameter->name));
+        return Resolution::of($extra[$parameter->name] ?? null);
     }
 }

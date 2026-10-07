@@ -9,5 +9,8 @@ use Kareylo\EntityRouting\RouteParameter;
  */
 interface ParameterResolver
 {
-    public function resolve(RouteParameter $parameter, mixed $entity): Resolution;
+    /**
+     * @param  array<array-key, mixed>  $extra  explicit values given by the caller
+     */
+    public function resolve(RouteParameter $parameter, mixed $entity, array $extra): Resolution;
 }
